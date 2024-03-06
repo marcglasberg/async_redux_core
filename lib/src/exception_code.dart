@@ -26,13 +26,13 @@
 /// Example:
 ///
 /// ```dart
-/// class MyExceptionCode extends ExceptionCode {
+/// class MyCode extends ExceptionCode {
 ///   final int codeNumber;
-///   MyExceptionCode(this.codeNumber);
+///   MyCode(this.codeNumber);
 ///
 ///   String? asText() => i18n;
 ///
-///   String toString() => 'MyExceptionCode{codeNumber: $codeNumber}';
+///   String toString() => 'MyCode{codeNumber: $codeNumber}';
 ///
 ///   bool operator ==(Object other) => identical(this, other) ||
 ///       other is AnotherTestExceptionCode && runtimeType == other.runtimeType && codeNumber == other.codeNumber;
@@ -46,11 +46,11 @@
 /// ```dart
 /// extension MyLocalization on Object {
 ///   static final _t = Translations.byId('en_us', {
-///     MyExceptionCode(1): {
+///     MyCode(1): {
 ///       'en_us': "Code One",
 ///       'pt': "Código Um",
 ///     },
-///     MyExceptionCode(2): {
+///     MyCode(2): {
 ///       'en_us': "Code Two",
 ///       'pt': "Código Dois",
 ///     },

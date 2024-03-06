@@ -15,16 +15,16 @@ import 'exception_code.dart';
 ///
 /// An [UserException] may have a [message] or an error [code] (if you provide
 /// both, the message will be ignored), as well as an optional [cause], which
-/// is a more specific root cause of the error. For example:
+/// is a more specific root cause of the exception. For example:
 ///
 /// ```dart
 /// throw UserException('Invalid email', cause: 'Must have at least 5 characters.');
 /// ```
 ///
 /// Method [titleAndContent] returns the title and content used in the error dialog.
-/// If the error has both a [message] an a [cause], the title of the dialog will
-/// be the [message], and its content will be the [cause]. Otherwise, the dialog
-/// will be empty, and content will be the [message].
+/// If the exception has both a [message] an a [cause], the title will be
+/// the [message], and its content will be the [cause]. Otherwise, the title
+/// will be empty, and the content will be the [message].
 ///
 /// Alternatively, if you provide a [code] instead of a [message], this code must
 /// be a subclass of type [ExceptionCode] that you define. In this case, the
@@ -53,9 +53,9 @@ class UserException implements Exception {
   /// Another message which is the cause of the user-exception.
   final String? cause;
 
-  /// Instead of [message] we may provide a code. This may be used for error message
-  /// translations, and also to simplify receiving errors from web-services,
-  /// cloud-functions etc.
+  /// Instead of [message] we may provide a code. This may be used for error
+  /// message translations, and also to simplify receiving errors from
+  /// web-services, cloud-functions etc.
   final ExceptionCode? code;
 
   /// Creates a [UserException], given a message [message] of type String,
@@ -98,6 +98,17 @@ class UserException implements Exception {
       return this;
   }
 
+  /// Based on the [message], [code] and [cause], returns the title and content to be
+  /// used in some UI to show the exception the user. The UI is usually a dialog or toast.
+  ///
+  /// If the exception has both a [message] an a [cause], the title will be
+  /// the [message], and its content will be the [cause]. Otherwise, the title
+  /// will be empty, and the content will be the [message].
+  ///
+  /// Alternatively, if you provide a [code] instead of a [message], this code must
+  /// be a subclass of type [ExceptionCode] that you define. In this case, the
+  /// message of the exception will be the string returned by the [ExceptionCode.asText] method.
+  ///
   (String, String) titleAndContent() {
     if (_ifHasMsgOrCode()) {
       if (cause == null || cause!.isEmpty)
@@ -113,17 +124,19 @@ class UserException implements Exception {
       return ('User Error', '');
   }
 
-  /// Use this to set the locale used to translate the text "Reason:" used to explain the
-  /// chain of causes in the [UserException]. The default is the current locale.
+  /// Use this to set the locale used by method [titleAndContent] to translate the
+  /// text "Reason:" used to explain the chain of causes in the [UserException].
   ///
-  /// If you remove the default locale with `setDefaultLocale(null)`,
-  /// the default will be English of the Unites States.
+  /// If you remove the locale with `setDefaultLocale(null)`, the default will
+  /// be English of the Unites States.
   ///
   /// Note: This uses the `i18n_extension_core` package from https://pub.dev/packages/i18n_extension_core
-  /// If you already use that package (or its Flutter brother `i18n_extension` from https://pub.dev/packages/i18n_extension)
-  /// in your app, there is no need to use [UserException.setDefaultLocale]
-  /// because the locale here will already work as expected.
-  static void setDefaultLocale(String? localeStr) => DefaultLocale.set(localeStr);
+  ///
+  /// IMPORTANT: If you already use `i18n_extension_core` (in your Dart-only code)
+  /// or `i18n_extension` (in your Flutter app), there is no need to ever
+  /// call [UserException.setLocale], because the locale will already have been set.
+  ///
+  static void setLocale(String? localeStr) => DefaultLocale.set(localeStr);
 
   /// Joins the given strings, such as the second is the reason for the first.
   /// Will return a message such as "first\n\nReason: second".
@@ -139,7 +152,7 @@ class UserException implements Exception {
 
   /// The default text to join the causes in a string.
   /// You can change this variable to inject another way to join them.
-  static var defaultJoinString = () => "\n\n${"Reason".i18n}: ";
+  static var defaultJoinString = () => "\n\n${"Reason:".i18n} ";
 
   /// If there is a [code], and this [code] has a non-empty text returned by
   /// [ExceptionCode.asText] in the given [StringLocale], return this text.
@@ -157,54 +170,6 @@ class UserException implements Exception {
 
   @override
   String toString() => 'UserException{' + joinCauses(_msgOrCode(), cause) + '}';
-
-  /// Creates a [UserException] from a JSON object.
-  ///
-  /// Important: The [cause] and the [code] will be represented as Strings,
-  /// and [_onOk] and [_onCancel] will be ignored. This means the [fromJson] method
-  /// may not be able to reconstruct the original exception.
-  ///
-  /// ---
-  /// Use with Celest (https://celest.dev/):
-  ///
-  /// Currently you can't import Async Redux in the backend part of Celest, because it uses Flutter.
-  /// Once I move this [UserException] class into a separate Dart-only package called
-  /// `async_redux_core`, you will be able to use it with Celest, as long as you export it
-  /// from `celest/lib/exceptions.dart`:
-  ///
-  /// ```dart
-  /// export 'package:async_redux_core/user_exception.dart;
-  /// ```
-  factory UserException.fromJson(Map<String, dynamic> json) {
-    return UserException(
-      json['msg'],
-      cause: json['cause'],
-      code: json['code'],
-    );
-  }
-
-  /// Creates a JSON object from a [UserException].
-  ///
-  /// Important: The [cause] and the [code] will be represented as Strings,
-  /// and [_onOk] and [_onCancel] will be ignored. This means the [fromJson] method
-  /// may not be able to reconstruct the original exception.
-  ///
-  /// ---
-  /// Use with Celest (https://celest.dev/):
-  ///
-  /// Currently you can't import Async Redux in the backend part of Celest, because it uses Flutter.
-  /// Once I move this [UserException] class into a separate Dart-only package called
-  /// `async_redux_core`, you will be able to use it with Celest, as long as you export it
-  /// from `celest/lib/exceptions.dart`:
-  ///
-  /// ```dart
-  /// export 'package:async_redux_core/user_exception.dart;
-  /// ```
-  Map<String, dynamic> toJson() => {
-        'msg': message,
-        if (cause != null) 'cause': cause.toString(),
-        if (code != null) 'code': code.toString(),
-      };
 
   @override
   bool operator ==(Object other) =>

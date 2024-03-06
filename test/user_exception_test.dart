@@ -5,15 +5,15 @@ import 'package:test/test.dart';
 void main() {
   test('should create UserException with correct properties', () {
     final exception = UserException(
-      'My message',
-      cause: 'My cause',
-      code: SomeExceptionCode(),
+      'message',
+      cause: 'cause',
+      code: SomeCode(),
     );
 
-    expect(exception.message, 'My message');
-    expect(exception.cause, 'My cause');
-    expect(exception.code, isA<SomeExceptionCode>());
-    expect(exception.code!.asText(), 'My code');
+    expect(exception.message, 'message');
+    expect(exception.cause, 'cause');
+    expect(exception.code, isA<SomeCode>());
+    expect(exception.code!.asText(), 'Some Code');
   });
 
   // Test all combinations:
@@ -34,8 +34,8 @@ void main() {
     //    - Dialog title: NÃO TEM
     //    - Dialog content: `msg`
     //
-    var exception = const UserException('My message');
-    expect(exception.titleAndContent(), ('', 'My message'));
+    var exception = const UserException('message');
+    expect(exception.titleAndContent(), ('', 'message'));
 
     // 2) - `msg` is NOT provided
     //    - `cause` is provided
@@ -44,8 +44,8 @@ void main() {
     //    - Dialog title: NÃO TEM
     //    - Dialog content: `cause`
     //
-    exception = const UserException(null, cause: 'My cause');
-    expect(exception.titleAndContent(), ('', 'My cause'));
+    exception = const UserException(null, cause: 'cause');
+    expect(exception.titleAndContent(), ('', 'cause'));
 
     // 3) - `msg` is NOT provided
     //    - `cause` is NOT provided
@@ -54,8 +54,8 @@ void main() {
     //    - Dialog title: NÃO TEM
     //    - Dialog content: `cause`
     //
-    exception = UserException(null, code: SomeExceptionCode());
-    expect(exception.titleAndContent(), ('', 'My code'));
+    exception = UserException(null, code: SomeCode());
+    expect(exception.titleAndContent(), ('', 'Some Code'));
 
     // 4) - `msg` is provided
     //    - `cause` is provided
@@ -66,11 +66,11 @@ void main() {
     //    - Ignored: `msg`
     //
     exception = UserException(
-      'My message',
-      cause: 'My cause',
-      code: SomeExceptionCode(),
+      'message',
+      cause: 'cause',
+      code: SomeCode(),
     );
-    expect(exception.titleAndContent(), ('My code', 'My cause'));
+    expect(exception.titleAndContent(), ('Some Code', 'cause'));
 
     // 5) - `msg` is provided
     //    - `cause` is provided
@@ -79,8 +79,8 @@ void main() {
     //    - Dialog title: `msg`
     //    - Dialog content: `cause`
     //
-    exception = const UserException('My message', cause: 'My cause');
-    expect(exception.titleAndContent(), ('My message', 'My cause'));
+    exception = const UserException('message', cause: 'cause');
+    expect(exception.titleAndContent(), ('message', 'cause'));
 
     // 6) - `msg` is NOT provided
     //    - `cause` is NOT provided
@@ -100,8 +100,8 @@ void main() {
     //    - Dialog content: `code`
     //    - Ignored: `msg`
     //
-    exception = UserException('My message', code: SomeExceptionCode());
-    expect(exception.titleAndContent(), ('', 'My code'));
+    exception = UserException('message', code: SomeCode());
+    expect(exception.titleAndContent(), ('', 'Some Code'));
 
     // 8) - `msg` is NOT provided
     //    - `cause` is provided
@@ -111,13 +111,13 @@ void main() {
     //    - Dialog content: `cause`
     //    - Ignored: `msg`
     //
-    exception = UserException(null, cause: 'My cause', code: SomeExceptionCode());
-    expect(exception.titleAndContent(), ('My code', 'My cause'));
+    exception = UserException(null, cause: 'cause', code: SomeCode());
+    expect(exception.titleAndContent(), ('Some Code', 'cause'));
   });
 
   test('Added UserException cause, with msg only', () {
     //
-    DefaultLocale.set("en");
+    UserException.setLocale('en');
     var joinStr = UserException.defaultJoinString();
 
     // 1) - `msg` is provided
@@ -127,8 +127,8 @@ void main() {
     //    - Dialog title: NÃO TEM
     //    - Dialog content: `msg`
     //
-    var exception = const UserException('My message').addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('My message', 'Extra'));
+    var exception = const UserException('message').addCause(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('message', 'Extra'));
 
     // 2) - `msg` is NOT provided
     //    - `cause` is provided
@@ -137,8 +137,8 @@ void main() {
     //    - Dialog title: NÃO TEM
     //    - Dialog content: `cause`
     //
-    exception = const UserException(null, cause: 'My cause').addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('My cause', 'Extra'));
+    exception = const UserException(null, cause: 'cause').addCause(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('cause', 'Extra'));
 
     // 3) - `msg` is NOT provided
     //    - `cause` is NOT provided
@@ -147,9 +147,8 @@ void main() {
     //    - Dialog title: NÃO TEM
     //    - Dialog content: `cause`
     //
-    exception =
-        UserException(null, code: SomeExceptionCode()).addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('My code', 'Extra'));
+    exception = UserException(null, code: SomeCode()).addCause(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('Some Code', 'Extra'));
 
     // 4) - `msg` is provided
     //    - `cause` is provided
@@ -160,11 +159,11 @@ void main() {
     //    - Ignored: `msg`
     //
     exception = UserException(
-      'My message',
-      cause: 'My cause',
-      code: SomeExceptionCode(),
+      'message',
+      cause: 'cause',
+      code: SomeCode(),
     ).addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('My code', 'My cause${joinStr}Extra'));
+    expect(exception.titleAndContent(), ('Some Code', 'cause${joinStr}Extra'));
 
     // 5) - `msg` is provided
     //    - `cause` is provided
@@ -174,8 +173,8 @@ void main() {
     //    - Dialog content: `cause`
     //
     exception =
-        const UserException('My message', cause: 'My cause').addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('My message', 'My cause${joinStr}Extra'));
+        const UserException('message', cause: 'cause').addCause(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('message', 'cause${joinStr}Extra'));
 
     // 6) - `msg` is NOT provided
     //    - `cause` is NOT provided
@@ -195,9 +194,8 @@ void main() {
     //    - Dialog content: `code`
     //    - Ignored: `msg`
     //
-    exception = UserException('My message', code: SomeExceptionCode())
-        .addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('My code', 'Extra'));
+    exception = UserException('message', code: SomeCode()).addCause(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('Some Code', 'Extra'));
 
     // 8) - `msg` is NOT provided
     //    - `cause` is provided
@@ -207,16 +205,16 @@ void main() {
     //    - Dialog content: `cause`
     //    - Ignored: `msg`
     //
-    exception = UserException(null, cause: 'My cause', code: SomeExceptionCode())
+    exception = UserException(null, cause: 'cause', code: SomeCode())
         .addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('My code', 'My cause${joinStr}Extra'));
+    expect(exception.titleAndContent(), ('Some Code', 'cause${joinStr}Extra'));
   });
 
   test('The "Reason" text is translated to the current locale.', () {
     //
     // Spanish:
 
-    DefaultLocale.set("es");
+    UserException.setLocale('es');
     var joinStr = UserException.defaultJoinString();
     expect(
         joinStr,
@@ -226,7 +224,7 @@ void main() {
 
     // Portuguese
 
-    DefaultLocale.set("pt");
+    UserException.setLocale('pt');
     joinStr = UserException.defaultJoinString();
     expect(
         joinStr,
@@ -234,18 +232,18 @@ void main() {
         '\n'
         'Motivo: ');
 
-    var exception = UserException('My message', code: SomeExceptionCode());
-    expect(exception.titleAndContent(), ('', 'Meu código'));
+    var exception = UserException('message', code: SomeCode());
+    expect(exception.titleAndContent(), ('', 'Um Código'));
 
-    exception = UserException('My message', code: MyExceptionCode(1));
+    exception = UserException('message', code: MyCode(1));
     expect(exception.titleAndContent(), ('', 'Código Um'));
 
-    exception = UserException('My message', code: MyExceptionCode(2));
+    exception = UserException('message', code: MyCode(2));
     expect(exception.titleAndContent(), ('', 'Código Dois'));
 
     // English:
 
-    DefaultLocale.set("en");
+    UserException.setLocale('en');
     joinStr = UserException.defaultJoinString();
     expect(
         joinStr,
@@ -253,49 +251,47 @@ void main() {
         '\n'
         'Reason: ');
 
-    exception = UserException('My message', code: SomeExceptionCode());
-    expect(exception.titleAndContent(), ('', 'My code'));
+    exception = UserException('message', code: SomeCode());
+    expect(exception.titleAndContent(), ('', 'Some Code'));
 
-    exception = UserException('My message', code: MyExceptionCode(1));
+    exception = UserException('message', code: MyCode(1));
     expect(exception.titleAndContent(), ('', 'Code One'));
 
-    exception = UserException('My message', code: MyExceptionCode(2));
+    exception = UserException('message', code: MyCode(2));
     expect(exception.titleAndContent(), ('', 'Code Two'));
   });
 }
 
-class SomeExceptionCode extends ExceptionCode {
+class SomeCode extends ExceptionCode {
   @override
-  String? asText() => 'My code'.i18n;
+  String? asText() => 'Some Code'.i18n;
 }
 
-class MyExceptionCode extends ExceptionCode {
-  final int codeNumber;
+class MyCode extends ExceptionCode {
+  final int code;
 
-  MyExceptionCode(this.codeNumber);
+  MyCode(this.code);
 
   @override
   String? asText() => i18n;
 
   @override
-  String toString() => 'MyExceptionCode{codeNumber: $codeNumber}';
+  String toString() => 'MyCode{code: $code}';
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MyExceptionCode &&
-          runtimeType == other.runtimeType &&
-          codeNumber == other.codeNumber;
+      other is MyCode && runtimeType == other.runtimeType && code == other.code;
 
   @override
-  int get hashCode => codeNumber.hashCode;
+  int get hashCode => code.hashCode;
 }
 
 extension SomeLocalization on String {
   static final _t = Translations.byText('en_us') +
       {
-        "en_us": "My code",
-        "pt": "Meu código",
+        'en_us': 'Some Code',
+        'pt': 'Um Código',
       };
 
   String get i18n => localize(this, _t);
@@ -303,13 +299,13 @@ extension SomeLocalization on String {
 
 extension MyLocalization on Object {
   static final _t = Translations.byId('en_us', {
-    MyExceptionCode(1): {
-      'en_us': "Code One",
-      'pt': "Código Um",
+    MyCode(1): {
+      'en_us': 'Code One',
+      'pt': 'Código Um',
     },
-    MyExceptionCode(2): {
-      'en_us': "Code Two",
-      'pt': "Código Dois",
+    MyCode(2): {
+      'en_us': 'Code Two',
+      'pt': 'Código Dois',
     },
   });
 
