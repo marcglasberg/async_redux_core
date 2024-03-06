@@ -14,8 +14,8 @@ the [async_redux](https://pub.dev/packages/async_redux) package._
 
 ## In your Dart server or Dart-only code:
 
-* At the moment, this Dart-only package simply contains the `UserException` and `ExceptionCode`
-  classes, and nothing more.
+* For the moment, this Dart-only package simply contains the `UserException` class, and nothing
+  more.
 
 * If you are creating code for a Dart server (backend) like [Celest](https://celest.dev/), or
   developing some Dart-only package that does not depend on Flutter, then you can use this package

@@ -4,16 +4,15 @@ import 'package:test/test.dart';
 
 void main() {
   test('should create UserException with correct properties', () {
-    final exception = UserException(
+    const exception = UserException(
       'message',
       cause: 'cause',
-      code: SomeCode(),
+      code: 123,
     );
 
     expect(exception.message, 'message');
     expect(exception.cause, 'cause');
-    expect(exception.code, isA<SomeCode>());
-    expect(exception.code!.asText(), 'Some Code');
+    expect(exception.code, 123);
   });
 
   // Test all combinations:
@@ -54,8 +53,8 @@ void main() {
     //    - Dialog title: NÃO TEM
     //    - Dialog content: `cause`
     //
-    exception = UserException(null, code: SomeCode());
-    expect(exception.titleAndContent(), ('', 'Some Code'));
+    exception = const UserException(null, code: 123);
+    expect(exception.titleAndContent(), ('', '123'));
 
     // 4) - `msg` is provided
     //    - `cause` is provided
@@ -65,12 +64,12 @@ void main() {
     //    - Dialog content: `cause`
     //    - Ignored: `msg`
     //
-    exception = UserException(
+    exception = const UserException(
       'message',
       cause: 'cause',
-      code: SomeCode(),
+      code: 123,
     );
-    expect(exception.titleAndContent(), ('Some Code', 'cause'));
+    expect(exception.titleAndContent(), ('123', 'cause'));
 
     // 5) - `msg` is provided
     //    - `cause` is provided
@@ -100,8 +99,8 @@ void main() {
     //    - Dialog content: `code`
     //    - Ignored: `msg`
     //
-    exception = UserException('message', code: SomeCode());
-    expect(exception.titleAndContent(), ('', 'Some Code'));
+    exception = const UserException('message', code: 123);
+    expect(exception.titleAndContent(), ('', '123'));
 
     // 8) - `msg` is NOT provided
     //    - `cause` is provided
@@ -111,8 +110,8 @@ void main() {
     //    - Dialog content: `cause`
     //    - Ignored: `msg`
     //
-    exception = UserException(null, cause: 'cause', code: SomeCode());
-    expect(exception.titleAndContent(), ('Some Code', 'cause'));
+    exception = const UserException(null, cause: 'cause', code: 123);
+    expect(exception.titleAndContent(), ('123', 'cause'));
   });
 
   test('Added UserException cause, with msg only', () {
@@ -147,8 +146,8 @@ void main() {
     //    - Dialog title: NÃO TEM
     //    - Dialog content: `cause`
     //
-    exception = UserException(null, code: SomeCode()).addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('Some Code', 'Extra'));
+    exception = const UserException(null, code: 123).addCause(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('123', 'Extra'));
 
     // 4) - `msg` is provided
     //    - `cause` is provided
@@ -158,12 +157,12 @@ void main() {
     //    - Dialog content: `cause`
     //    - Ignored: `msg`
     //
-    exception = UserException(
+    exception = const UserException(
       'message',
       cause: 'cause',
-      code: SomeCode(),
+      code: 123,
     ).addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('Some Code', 'cause${joinStr}Extra'));
+    expect(exception.titleAndContent(), ('123', 'cause${joinStr}Extra'));
 
     // 5) - `msg` is provided
     //    - `cause` is provided
@@ -194,8 +193,8 @@ void main() {
     //    - Dialog content: `code`
     //    - Ignored: `msg`
     //
-    exception = UserException('message', code: SomeCode()).addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('Some Code', 'Extra'));
+    exception = const UserException('message', code: 123).addCause(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('123', 'Extra'));
 
     // 8) - `msg` is NOT provided
     //    - `cause` is provided
@@ -205,9 +204,9 @@ void main() {
     //    - Dialog content: `cause`
     //    - Ignored: `msg`
     //
-    exception = UserException(null, cause: 'cause', code: SomeCode())
-        .addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('Some Code', 'cause${joinStr}Extra'));
+    exception =
+        const UserException(null, cause: 'cause', code: 123).addCause(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('123', 'cause${joinStr}Extra'));
   });
 
   test('The "Reason" text is translated to the current locale.', () {
@@ -232,15 +231,6 @@ void main() {
         '\n'
         'Motivo: ');
 
-    var exception = UserException('message', code: SomeCode());
-    expect(exception.titleAndContent(), ('', 'Um Código'));
-
-    exception = UserException('message', code: MyCode(1));
-    expect(exception.titleAndContent(), ('', 'Código Um'));
-
-    exception = UserException('message', code: MyCode(2));
-    expect(exception.titleAndContent(), ('', 'Código Dois'));
-
     // English:
 
     UserException.setLocale('en');
@@ -250,64 +240,92 @@ void main() {
         '\n'
         '\n'
         'Reason: ');
+  });
 
-    exception = UserException('message', code: SomeCode());
-    expect(exception.titleAndContent(), ('', 'Some Code'));
+  test('The code is translated to the current locale using `codeTranslations`.', () {
+    //
+    UserException.codeTranslations = Translations.byId('en_us', {
+      1: {
+        'en_us': 'Code One',
+        'pt': 'Código Um',
+      },
+      2: {
+        'en_us': 'Code Two',
+        'pt': 'Código Dois',
+      },
+    });
 
-    exception = UserException('message', code: MyCode(1));
+    // English:
+
+    UserException.setLocale('en');
+
+    // When there is no text translation associated with a code, the code itself is used.
+    var exception = const UserException('message', code: 123);
+    expect(exception.titleAndContent(), ('', '123'));
+
+    // There is a text translation.
+    exception = const UserException('message', code: 1);
     expect(exception.titleAndContent(), ('', 'Code One'));
 
-    exception = UserException('message', code: MyCode(2));
+    // There is a text translation.
+    exception = const UserException('message', code: 2);
     expect(exception.titleAndContent(), ('', 'Code Two'));
-  });
-}
 
-class SomeCode extends ExceptionCode {
-  @override
-  String? asText() => 'Some Code'.i18n;
-}
+    // Portuguese:
 
-class MyCode extends ExceptionCode {
-  final int code;
+    UserException.setLocale('pt');
 
-  MyCode(this.code);
+    // When there is no text translation associated with a code, the code itself is used.
+    exception = const UserException('message', code: 123);
+    expect(exception.titleAndContent(), ('', '123'));
 
-  @override
-  String? asText() => i18n;
+    // There is a text translation.
+    exception = const UserException('message', code: 1);
+    expect(exception.titleAndContent(), ('', 'Código Um'));
 
-  @override
-  String toString() => 'MyCode{code: $code}';
+    // There is a text translation.
+    exception = const UserException('message', code: 2);
+    expect(exception.titleAndContent(), ('', 'Código Dois'));
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MyCode && runtimeType == other.runtimeType && code == other.code;
+    // Unknown locale:
 
-  @override
-  int get hashCode => code.hashCode;
-}
+    UserException.setLocale('xx');
 
-extension SomeLocalization on String {
-  static final _t = Translations.byText('en_us') +
-      {
-        'en_us': 'Some Code',
-        'pt': 'Um Código',
-      };
+    // When there is no text translation associated with a code, the code itself is used.
+    exception = const UserException('message', code: 123);
+    expect(exception.titleAndContent(), ('', '123'));
 
-  String get i18n => localize(this, _t);
-}
+    // Use the 'en_us' translation (specified here: `Translations.byId('en_us'`).
+    exception = const UserException('message', code: 1);
+    expect(exception.titleAndContent(), ('', 'Code One'));
 
-extension MyLocalization on Object {
-  static final _t = Translations.byId('en_us', {
-    MyCode(1): {
-      'en_us': 'Code One',
-      'pt': 'Código Um',
-    },
-    MyCode(2): {
-      'en_us': 'Code Two',
-      'pt': 'Código Dois',
-    },
+    // Use the 'en_us' translation (specified here: `Translations.byId('en_us'`).
+    exception = const UserException('message', code: 2);
+    expect(exception.titleAndContent(), ('', 'Code Two'));
+
+    UserException.codeTranslations = null;
   });
 
-  String get i18n => localize(this, _t);
+  test('The code is associated with a translation using `translateCode`.', () {
+    //
+    // The current language doesn't matter anymore, since we are using this
+    // method to create the text from the code:
+    UserException.translateCode = (int? code) => 'The code is $code';
+
+    UserException.setLocale('en');
+
+    var exception = const UserException('message', code: 1);
+    expect(exception.titleAndContent(), ('', 'The code is 1'));
+
+    exception = const UserException('message', code: 123);
+    expect(exception.titleAndContent(), ('', 'The code is 123'));
+
+    UserException.setLocale('pt');
+
+    exception = const UserException('message', code: 1);
+    expect(exception.titleAndContent(), ('', 'The code is 1'));
+
+    exception = const UserException('message', code: 123);
+    expect(exception.titleAndContent(), ('', 'The code is 123'));
+  });
 }

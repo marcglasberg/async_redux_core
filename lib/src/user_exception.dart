@@ -4,8 +4,6 @@
 import 'package:async_redux_core/src/user_exception_i18n.dart';
 import 'package:i18n_extension_core/i18n_extension_core.dart';
 
-import 'exception_code.dart';
-
 /// The [UserException] represents an error the user could fix, like wrong typed
 /// text, or missing internet connection.
 ///
@@ -26,10 +24,9 @@ import 'exception_code.dart';
 /// the [message], and its content will be the [cause]. Otherwise, the title
 /// will be empty, and the content will be the [message].
 ///
-/// Alternatively, if you provide a [code] instead of a [message], this code must
-/// be a subclass of type [ExceptionCode] that you define. In this case, the
-/// message of the exception will be the string returned by
-/// the [ExceptionCode.asText] method.
+/// Alternatively, if you provide a numeric [code] instead of a [message].
+/// In this case, the message of the exception will be the one associated with
+/// the code (see [translateCode] and [codeTranslations]) for more details.
 ///
 /// ---
 ///
@@ -50,18 +47,16 @@ class UserException implements Exception {
   /// Some message shown to the user.
   final String? message;
 
+  /// Optionally, instead of [message] we may provide a numeric [code].
+  /// This code may have an associated message which is set in the client.
+  final int? code;
+
   /// Another message which is the cause of the user-exception.
   final String? cause;
 
-  /// Instead of [message] we may provide a code. This may be used for error
-  /// message translations, and also to simplify receiving errors from
-  /// web-services, cloud-functions etc.
-  final ExceptionCode? code;
-
   /// Creates a [UserException], given a message [message] of type String,
-  /// a [cause] of type String or [UserException], and an optional [code] of
-  /// type [ExceptionCode]. All fields are optional, but usually at least
-  /// the [message] or [code] is provided.
+  /// a [cause] of type String or [UserException], and an optional numeric [code].
+  /// All fields are optional, but usually at least the [message] or [code] is provided.
   const UserException(
     this.message, {
     this.code,
@@ -105,9 +100,9 @@ class UserException implements Exception {
   /// the [message], and its content will be the [cause]. Otherwise, the title
   /// will be empty, and the content will be the [message].
   ///
-  /// Alternatively, if you provide a [code] instead of a [message], this code must
-  /// be a subclass of type [ExceptionCode] that you define. In this case, the
-  /// message of the exception will be the string returned by the [ExceptionCode.asText] method.
+  /// Alternatively, if you provide a numeric [code] instead of a [message], the
+  /// text will be the one associated with the code (see [translateCode]
+  /// and [codeTranslations]) for more details.
   ///
   (String, String) titleAndContent() {
     if (_ifHasMsgOrCode()) {
@@ -154,16 +149,51 @@ class UserException implements Exception {
   /// You can change this variable to inject another way to join them.
   static var defaultJoinString = () => "\n\n${"Reason:".i18n} ";
 
-  /// If there is a [code], and this [code] has a non-empty text returned by
-  /// [ExceptionCode.asText] in the given [StringLocale], return this text.
-  /// Otherwise, if the [message] is a non-empty text, return this [message].
-  /// Otherwise, if there is a [code], return the [code] itself.
+  /// If you use error [code]s, you may provide their respective text messages here,
+  /// by providing a `Translations` object from the `i18n_extension` package. You can
+  /// only provide messages in English, or in multiple other languages.
+  ///
+  /// If you are NOT using the `i18n_extension`, you can ignore [codeTranslations]
+  /// and instead just modify the [translateCode] method to return a string from the [code].
+  ///
+  /// Example with English only:
+  ///
+  /// ```dart
+  /// UserException.codeTranslations = Translations.byId<int>('en', {
+  ///    1: { 'en': 'Invalid email' },
+  ///    2: { 'en': 'There is no connection' },
+  /// });
+  /// ```
+  ///
+  /// Example with multiple languages:
+  ///
+  /// ```dart
+  /// UserException.codeTranslations = Translations.byId<int>('en', {
+  ///    1: { 'en': 'Invalid email', 'pt': 'Email inválido' },
+  ///    2: { 'en': 'There is no connection', 'pt': 'Não há conexão' },
+  /// });
+  /// ```
+  static Translations? codeTranslations;
+
+  /// The [translateCode] method is called to convert error [code]s into text messages.
+  /// If you are using use the `i18n_extension`, you may provide [codeTranslations].
+  /// If you are NOT using the `i18n_extension`, you can instead modify
+  /// the [translateCode] method to return a string from the [code] in any way you want.
+  ///
+  static String Function(int?) translateCode = (int? code) =>
+      (codeTranslations == null) ? (code?.toString() ?? '') : localize(code, codeTranslations!);
+
+  /// If there is a [code], and this [code] has a translation, return the translation.
+  /// If the translation is empty, return the [message].
+  /// If the is no [code], return the [message].
   /// Otherwise, return an empty text.
   String _msgOrCode() {
-    String? codeAsText = code?.asText();
-    if (codeAsText != null && codeAsText.isNotEmpty) return codeAsText;
-    if (message != null && message!.isNotEmpty) return message!;
-    return code?.toString() ?? "";
+    var code = this.code;
+    if (code != null) {
+      String codeAsText = translateCode(code);
+      return codeAsText.isNotEmpty ? codeAsText : (message ?? '');
+    } else
+      return message ?? '';
   }
 
   bool _ifHasMsgOrCode() => (message != null && message!.isNotEmpty) || code != null;
