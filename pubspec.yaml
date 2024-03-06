@@ -1,0 +1,15 @@
+name: async_redux_core
+description: Dart-only package for Async Redux state management.
+version: 1.0.0
+# author: Marcelo Glasberg <marcglasberg@gmail.com>
+homepage: https://github.com/marcglasberg/async_redux_core
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  i18n_extension_core: ^2.0.6
+
+dev_dependencies:
+  lints: ^3.0.0
+  test: ^1.24.0
