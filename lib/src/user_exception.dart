@@ -5,12 +5,12 @@ import 'package:async_redux_core/src/user_exception_i18n.dart';
 import 'package:i18n_extension_core/i18n_extension_core.dart';
 import "package:meta/meta.dart";
 
-/// The [UserException] represents an error the user could fix, like wrong typed
-/// text, or missing internet connection.
+/// The [UserException] is an immutable class representing an error the user
+/// could fix, like wrong typed text, or missing internet connection.
 ///
-/// Async Redux will capture [UserException]s to show them in dialogs
-/// created with `UserExceptionDialog` or other UI you define in your widget
-/// tree (see the explanation in the docs).
+/// Async Redux will automatically capture [UserException]s to show them in
+/// dialogs created with `UserExceptionDialog` or other UI you define in your
+/// widget tree (see the explanation in the docs).
 ///
 /// An [UserException] may have a [message] or an error [code] (if you provide
 /// both, the message will be ignored), as well as an optional [reason], which
@@ -31,8 +31,69 @@ import "package:meta/meta.dart";
 ///
 /// ---
 ///
-/// You can define a special Matcher for your UserException, to use in your
-/// tests. Create a test lib with this code:
+/// The following methods and fields are available only in the `async_redux` package
+/// (for Flutter), and are not available for Dart-only code:
+///
+/// * Method `addCallbacks` is used to add `onOk` and `onCancel` callbacks to the [UserException].
+/// The `onOk` callback will be called when the user taps OK in the error dialog.
+/// The `onCancel` callback will be called when the user taps CANCEL in the error dialog.
+/// If the exception already had callbacks, the new callbacks will be merged with the old ones,
+/// and the old callbacks will be called before the new ones.
+///
+///
+/// * Field `onOk` is a callback to be called when the user presses the "Ok" button in
+/// the error dialog.
+///
+/// * Field `onCancel` is a callback to be called when the user presses the "Cancel"
+/// button in the error dialog.
+///
+/// * Method `addCause` adds the given `cause` to the [UserException].
+/// Note the added [cause] won't replace the original cause, but will be added to it.
+/// If the added [cause] is a `null`, it will return the current exception, unchanged.
+/// If the added [cause] is a [String], the [addReason] method will be used to
+/// return the new exception.
+/// If the added [cause] is a [UserException], the [mergedWith] method will be used to
+/// return the new exception.
+/// If the added [cause] is any other type, including any other error types, it will be
+/// set as the property `hardCause` of the exception. The hard cause is meant to be some
+/// error which caused the [UserException], but that is not a [UserException] itself.
+/// For example, if `int.parse('a')` throws a `FormatException`, then
+/// `throw UserException('Invalid number').addCause(FormatException('Invalid input'))`.
+/// will set the `FormatException` as the hard cause.
+///
+/// * Field `hardCause` the hard cause of the exception, if any, that may have been set
+/// by the method `addCause`.
+///
+/// * Method `addProps` adds key-value pair properties to the [UserException].
+/// If the exception already had properties, the new `props` will be merged with the old ones.
+///
+/// * Field `props` is the properties added to the exception, if any.
+/// They are an immutable-map of key-value pairs, of type `IMap<String, dynamic>`.
+/// To read the properties, use the `[]` operator, like this: `exception.props['key']`.
+/// If the key does not exist, it will return `null`.
+///
+/// Usage:
+///
+/// ```dart
+/// UserException(message, code: code, reason: reason)
+///    .addCallbacks(onOk: onOk, onCancel: onCancel)
+///    .addCause(cause)
+///    .withProps(props);
+/// ```
+///
+/// Example:
+///
+/// ```dart
+/// throw UserException('Invalid number')
+///    .addCause(FormatException('Invalid input'))
+///    .addProps({'number': 42}))
+///    .addCallbacks(onOk: () => print('OK'), onCancel: () => print('CANCEL'));
+/// ```
+///
+/// ---
+///
+/// You can define a special `Matcher` for your [UserException], to use in your
+/// tests. Create an test util file with this code:
 ///
 /// ```
 /// import 'package:matcher/matcher.dart';
@@ -43,8 +104,6 @@ import "package:meta/meta.dart";
 /// ```
 /// expect(() => someFunction(), throwsUserException);
 /// ```
-///
-/// Note: [UserException] is immutable.
 ///
 class UserException implements Exception {
   /// Some message shown to the user.
@@ -69,6 +128,7 @@ class UserException implements Exception {
   /// Returns a new [UserException], copied from the current one, but adding the given [reason].
   /// Note the added [reason] won't replace the original reason, but will be added to it.
   @useResult
+  @mustBeOverridden
   UserException addReason(String? reason) {
     //
     if (reason == null)
@@ -87,6 +147,7 @@ class UserException implements Exception {
   /// This simply means the given [userException] will be used as part of the [reason] of the
   /// current one.
   @useResult
+  @mustBeOverridden
   UserException mergedWith(UserException? userException) {
     //
     if (userException == null)
