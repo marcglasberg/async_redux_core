@@ -3,6 +3,7 @@
 
 import 'package:async_redux_core/src/user_exception_i18n.dart';
 import 'package:i18n_extension_core/i18n_extension_core.dart';
+import "package:meta/meta.dart";
 
 /// The [UserException] represents an error the user could fix, like wrong typed
 /// text, or missing internet connection.
@@ -67,6 +68,7 @@ class UserException implements Exception {
 
   /// Returns a new [UserException], copied from the current one, but adding the given [reason].
   /// Note the added [reason] won't replace the original reason, but will be added to it.
+  @useResult
   UserException addReason(String? reason) {
     //
     if (reason == null)
@@ -84,6 +86,7 @@ class UserException implements Exception {
   /// Returns a new [UserException], by merging the current one with the given [userException].
   /// This simply means the given [userException] will be used as part of the [reason] of the
   /// current one.
+  @useResult
   UserException mergedWith(UserException? userException) {
     //
     if (userException == null)
@@ -105,6 +108,7 @@ class UserException implements Exception {
   /// text will be the one associated with the code (see [translateCode]
   /// and [codeTranslations]) for more details.
   ///
+  @useResult
   (String, String) titleAndContent() {
     if (_ifHasMsgOrCode()) {
       if (reason == null || reason!.isEmpty)
