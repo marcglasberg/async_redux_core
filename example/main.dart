@@ -16,7 +16,7 @@ void main() {
   // 1) The UserException can produce its own title and content to be used in UIs
   // such as dialogs, toasts etc.
 
-  var exception = const UserException('Invalid email', cause: 'Must have at least 5 characters.');
+  var exception = const UserException('Invalid email', reason: 'Must have at least 5 characters.');
   var (title, content) = exception.titleAndContent();
 
   // Should print: 'title: "Invalid email", content: "Must have at least 5 characters."'

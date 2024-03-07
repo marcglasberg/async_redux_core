@@ -3,31 +3,31 @@ import 'package:i18n_extension_core/i18n_extension_core.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('should create UserException with correct properties', () {
+  test('Creates UserException with correct properties', () {
     const exception = UserException(
       'message',
-      cause: 'cause',
+      reason: 'reason',
       code: 123,
     );
 
     expect(exception.message, 'message');
-    expect(exception.cause, 'cause');
+    expect(exception.reason, 'reason');
     expect(exception.code, 123);
   });
 
   // Test all combinations:
-  // 1) msg provided, cause NOT provided, code NOT provided
-  // 2) msg NOT provided, cause provided, code NOT provided
-  // 3) msg NOT provided, cause NOT provided, code provided
-  // 4) msg provided, cause provided, code provided
-  // 5) msg provided, cause provided, code NOT provided
-  // 6) msg NOT provided, cause NOT provided, code NOT provided
-  // 7) msg provided, cause NOT provided, code provided
-  // 8) msg NOT provided, cause provided, code provided
+  // 1) msg provided, reason NOT provided, code NOT provided
+  // 2) msg NOT provided, reason provided, code NOT provided
+  // 3) msg NOT provided, reason NOT provided, code provided
+  // 4) msg provided, reason provided, code provided
+  // 5) msg provided, reason provided, code NOT provided
+  // 6) msg NOT provided, reason NOT provided, code NOT provided
+  // 7) msg provided, reason NOT provided, code provided
+  // 8) msg NOT provided, reason provided, code provided
   test('dialogTitle and dialogContent1', () {
     //
     // 1) - `msg` is provided
-    //    - `cause` is NOT provided
+    //    - `reason` is NOT provided
     //    - `code` is NOT provided
     // Then:
     //    - Dialog title: NÃO TEM
@@ -37,52 +37,52 @@ void main() {
     expect(exception.titleAndContent(), ('', 'message'));
 
     // 2) - `msg` is NOT provided
-    //    - `cause` is provided
+    //    - `reason` is provided
     //    - `code` is NOT provided
     // Then:
     //    - Dialog title: NÃO TEM
-    //    - Dialog content: `cause`
+    //    - Dialog content: `reason`
     //
-    exception = const UserException(null, cause: 'cause');
-    expect(exception.titleAndContent(), ('', 'cause'));
+    exception = const UserException(null, reason: 'reason');
+    expect(exception.titleAndContent(), ('', 'reason'));
 
     // 3) - `msg` is NOT provided
-    //    - `cause` is NOT provided
+    //    - `reason` is NOT provided
     //    - `code` is provided
     // Then:
     //    - Dialog title: NÃO TEM
-    //    - Dialog content: `cause`
+    //    - Dialog content: `reason`
     //
     exception = const UserException(null, code: 123);
     expect(exception.titleAndContent(), ('', '123'));
 
     // 4) - `msg` is provided
-    //    - `cause` is provided
+    //    - `reason` is provided
     //    - `code` is provided
     // Then:
     //    - Dialog title: `code`
-    //    - Dialog content: `cause`
+    //    - Dialog content: `reason`
     //    - Ignored: `msg`
     //
     exception = const UserException(
       'message',
-      cause: 'cause',
+      reason: 'reason',
       code: 123,
     );
-    expect(exception.titleAndContent(), ('123', 'cause'));
+    expect(exception.titleAndContent(), ('123', 'reason'));
 
     // 5) - `msg` is provided
-    //    - `cause` is provided
+    //    - `reason` is provided
     //    - `code` is NOT provided
     // Then:
     //    - Dialog title: `msg`
-    //    - Dialog content: `cause`
+    //    - Dialog content: `reason`
     //
-    exception = const UserException('message', cause: 'cause');
-    expect(exception.titleAndContent(), ('message', 'cause'));
+    exception = const UserException('message', reason: 'reason');
+    expect(exception.titleAndContent(), ('message', 'reason'));
 
     // 6) - `msg` is NOT provided
-    //    - `cause` is NOT provided
+    //    - `reason` is NOT provided
     //    - `code` is NOT provided
     // Then:
     //    - Dialog title: NÃO TEM
@@ -92,7 +92,7 @@ void main() {
     expect(exception.titleAndContent(), ('User Error', ''));
 
     // 7) - `msg` is provided
-    //    - `cause` is NOT provided
+    //    - `reason` is NOT provided
     //    - `code` is provided
     // Then:
     //    - Dialog title: NÃO TEM
@@ -103,110 +103,205 @@ void main() {
     expect(exception.titleAndContent(), ('', '123'));
 
     // 8) - `msg` is NOT provided
-    //    - `cause` is provided
+    //    - `reason` is provided
     //    - `code` is provided
     // Then:
     //    - Dialog title: `code`
-    //    - Dialog content: `cause`
+    //    - Dialog content: `reason`
     //    - Ignored: `msg`
     //
-    exception = const UserException(null, cause: 'cause', code: 123);
-    expect(exception.titleAndContent(), ('123', 'cause'));
+    exception = const UserException(null, reason: 'reason', code: 123);
+    expect(exception.titleAndContent(), ('123', 'reason'));
   });
 
-  test('Added UserException cause, with msg only', () {
+  test('Added reason', () {
     //
     UserException.setLocale('en');
     var joinStr = UserException.defaultJoinString();
 
     // 1) - `msg` is provided
-    //    - `cause` is NOT provided
+    //    - `reason` is NOT provided
     //    - `code` is NOT provided
     // Then:
     //    - Dialog title: NÃO TEM
     //    - Dialog content: `msg`
     //
-    var exception = const UserException('message').addCause(const UserException('Extra'));
+    var exception = const UserException('message').addReason('Extra');
     expect(exception.titleAndContent(), ('message', 'Extra'));
 
     // 2) - `msg` is NOT provided
-    //    - `cause` is provided
+    //    - `reason` is provided
     //    - `code` is NOT provided
     // Then:
     //    - Dialog title: NÃO TEM
-    //    - Dialog content: `cause`
+    //    - Dialog content: `reason`
     //
-    exception = const UserException(null, cause: 'cause').addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('cause', 'Extra'));
+    exception = const UserException(null, reason: 'reason').addReason('Extra');
+    expect(exception.titleAndContent(), ('reason', 'Extra'));
 
     // 3) - `msg` is NOT provided
-    //    - `cause` is NOT provided
+    //    - `reason` is NOT provided
     //    - `code` is provided
     // Then:
     //    - Dialog title: NÃO TEM
-    //    - Dialog content: `cause`
+    //    - Dialog content: `reason`
     //
-    exception = const UserException(null, code: 123).addCause(const UserException('Extra'));
+    exception = const UserException(null, code: 123).addReason('Extra');
     expect(exception.titleAndContent(), ('123', 'Extra'));
 
     // 4) - `msg` is provided
-    //    - `cause` is provided
+    //    - `reason` is provided
     //    - `code` is provided
     // Then:
     //    - Dialog title: `code`
-    //    - Dialog content: `cause`
+    //    - Dialog content: `reason`
     //    - Ignored: `msg`
     //
     exception = const UserException(
       'message',
-      cause: 'cause',
+      reason: 'reason',
       code: 123,
-    ).addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('123', 'cause${joinStr}Extra'));
+    ).addReason('Extra');
+    expect(exception.titleAndContent(), ('123', 'reason${joinStr}Extra'));
 
     // 5) - `msg` is provided
-    //    - `cause` is provided
+    //    - `reason` is provided
     //    - `code` is NOT provided
     // Then:
     //    - Dialog title: `msg`
-    //    - Dialog content: `cause`
+    //    - Dialog content: `reason`
     //
     exception =
-        const UserException('message', cause: 'cause').addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('message', 'cause${joinStr}Extra'));
+        const UserException('message', reason: 'reason').addReason('Extra');
+    expect(exception.titleAndContent(), ('message', 'reason${joinStr}Extra'));
 
     // 6) - `msg` is NOT provided
-    //    - `cause` is NOT provided
+    //    - `reason` is NOT provided
     //    - `code` is NOT provided
     // Then:
     //    - Dialog title: NÃO TEM
     //    - Dialog content: `msg`
     //
-    exception = const UserException(null).addCause(const UserException('Extra'));
+    exception = const UserException(null).addReason('Extra');
     expect(exception.titleAndContent(), ('', 'Extra'));
 
     // 7) - `msg` is provided
-    //    - `cause` is NOT provided
+    //    - `reason` is NOT provided
     //    - `code` is provided
     // Then:
     //    - Dialog title: NÃO TEM
     //    - Dialog content: `code`
     //    - Ignored: `msg`
     //
-    exception = const UserException('message', code: 123).addCause(const UserException('Extra'));
+    exception = const UserException('message', code: 123).addReason('Extra');
     expect(exception.titleAndContent(), ('123', 'Extra'));
 
     // 8) - `msg` is NOT provided
-    //    - `cause` is provided
+    //    - `reason` is provided
     //    - `code` is provided
     // Then:
     //    - Dialog title: `code`
-    //    - Dialog content: `cause`
+    //    - Dialog content: `reason`
     //    - Ignored: `msg`
     //
     exception =
-        const UserException(null, cause: 'cause', code: 123).addCause(const UserException('Extra'));
-    expect(exception.titleAndContent(), ('123', 'cause${joinStr}Extra'));
+        const UserException(null, reason: 'reason', code: 123).addReason('Extra');
+    expect(exception.titleAndContent(), ('123', 'reason${joinStr}Extra'));
+  });
+
+  test('Merged UserException', () {
+    //
+    UserException.setLocale('en');
+    var joinStr = UserException.defaultJoinString();
+
+    // 1) - `msg` is provided
+    //    - `reason` is NOT provided
+    //    - `code` is NOT provided
+    // Then:
+    //    - Dialog title: NÃO TEM
+    //    - Dialog content: `msg`
+    //
+    var exception = const UserException('message').mergedWith(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('message', 'Extra'));
+
+    // 2) - `msg` is NOT provided
+    //    - `reason` is provided
+    //    - `code` is NOT provided
+    // Then:
+    //    - Dialog title: NÃO TEM
+    //    - Dialog content: `reason`
+    //
+    exception = const UserException(null, reason: 'reason').mergedWith(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('reason', 'Extra'));
+
+    // 3) - `msg` is NOT provided
+    //    - `reason` is NOT provided
+    //    - `code` is provided
+    // Then:
+    //    - Dialog title: NÃO TEM
+    //    - Dialog content: `reason`
+    //
+    exception = const UserException(null, code: 123).mergedWith(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('123', 'Extra'));
+
+    // 4) - `msg` is provided
+    //    - `reason` is provided
+    //    - `code` is provided
+    // Then:
+    //    - Dialog title: `code`
+    //    - Dialog content: `reason`
+    //    - Ignored: `msg`
+    //
+    exception = const UserException(
+      'message',
+      reason: 'reason',
+      code: 123,
+    ).mergedWith(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('123', 'reason${joinStr}Extra'));
+
+    // 5) - `msg` is provided
+    //    - `reason` is provided
+    //    - `code` is NOT provided
+    // Then:
+    //    - Dialog title: `msg`
+    //    - Dialog content: `reason`
+    //
+    exception =
+        const UserException('message', reason: 'reason').mergedWith(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('message', 'reason${joinStr}Extra'));
+
+    // 6) - `msg` is NOT provided
+    //    - `reason` is NOT provided
+    //    - `code` is NOT provided
+    // Then:
+    //    - Dialog title: NÃO TEM
+    //    - Dialog content: `msg`
+    //
+    exception = const UserException(null).mergedWith(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('', 'Extra'));
+
+    // 7) - `msg` is provided
+    //    - `reason` is NOT provided
+    //    - `code` is provided
+    // Then:
+    //    - Dialog title: NÃO TEM
+    //    - Dialog content: `code`
+    //    - Ignored: `msg`
+    //
+    exception = const UserException('message', code: 123).mergedWith(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('123', 'Extra'));
+
+    // 8) - `msg` is NOT provided
+    //    - `reason` is provided
+    //    - `code` is provided
+    // Then:
+    //    - Dialog title: `code`
+    //    - Dialog content: `reason`
+    //    - Ignored: `msg`
+    //
+    exception =
+        const UserException(null, reason: 'reason', code: 123).mergedWith(const UserException('Extra'));
+    expect(exception.titleAndContent(), ('123', 'reason${joinStr}Extra'));
   });
 
   test('The "Reason" text is translated to the current locale.', () {

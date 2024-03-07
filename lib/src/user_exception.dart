@@ -12,16 +12,16 @@ import 'package:i18n_extension_core/i18n_extension_core.dart';
 /// tree (see the explanation in the docs).
 ///
 /// An [UserException] may have a [message] or an error [code] (if you provide
-/// both, the message will be ignored), as well as an optional [cause], which
-/// is a more specific root cause of the exception. For example:
+/// both, the message will be ignored), as well as an optional [reason], which
+/// is a more specific text that explains why the exception happened. For example:
 ///
 /// ```dart
-/// throw UserException('Invalid email', cause: 'Must have at least 5 characters.');
+/// throw UserException('Invalid email', reason: 'Must have at least 5 characters.');
 /// ```
 ///
 /// Method [titleAndContent] returns the title and content used in the error dialog.
-/// If the exception has both a [message] an a [cause], the title will be
-/// the [message], and its content will be the [cause]. Otherwise, the title
+/// If the exception has both a [message] an a [reason], the title will be
+/// the [message], and its content will be the [reason]. Otherwise, the title
 /// will be empty, and the content will be the [message].
 ///
 /// Alternatively, if you provide a numeric [code] instead of a [message].
@@ -43,6 +43,8 @@ import 'package:i18n_extension_core/i18n_extension_core.dart';
 /// expect(() => someFunction(), throwsUserException);
 /// ```
 ///
+/// Note: [UserException] is immutable.
+///
 class UserException implements Exception {
   /// Some message shown to the user.
   final String? message;
@@ -51,53 +53,52 @@ class UserException implements Exception {
   /// This code may have an associated message which is set in the client.
   final int? code;
 
-  /// Another message which is the cause of the user-exception.
-  final String? cause;
+  /// Another text which is the reason of the user-exception.
+  final String? reason;
 
   /// Creates a [UserException], given a message [message] of type String,
-  /// a [cause] of type String or [UserException], and an optional numeric [code].
+  /// a [reason] of type String or [UserException], and an optional numeric [code].
   /// All fields are optional, but usually at least the [message] or [code] is provided.
   const UserException(
     this.message, {
     this.code,
-    this.cause,
+    this.reason,
   });
 
-  /// Creates a [UserException], adding the given [cause].
-  /// Note the added [cause] won't replace the original cause, but will be added to it.
-  ///
-  /// The added [cause] must be:
-  /// - A [UserException]
-  /// - A [String]
-  /// - Or Null.
-  UserException addCause(Object? cause) {
+  /// Returns a new [UserException], copied from the current one, but adding the given [reason].
+  /// Note the added [reason] won't replace the original reason, but will be added to it.
+  UserException addReason(String? reason) {
     //
-    if (cause is String) {
-      if (_ifHasMsgOrCode()) {
-        return UserException(message, code: code, cause: joinCauses(this.cause, cause));
-      }
-      //
-      else if (this.cause != null && this.cause!.isNotEmpty)
-        return UserException(this.cause, cause: cause);
-      //
-      else
-        return UserException(cause);
-    }
-    //
-    if (cause is UserException) {
-      cause = joinCauses(cause._msgOrCode(), cause.cause);
-      return addCause(cause);
-    }
-    //
-    else
+    if (reason == null)
       return this;
+    else {
+      if (_ifHasMsgOrCode()) {
+        return UserException(message, code: code, reason: joinCauses(this.reason, reason));
+      } else if (this.reason != null && this.reason!.isNotEmpty)
+        return UserException(this.reason, reason: reason);
+      else
+        return UserException(reason);
+    }
   }
 
-  /// Based on the [message], [code] and [cause], returns the title and content to be
+  /// Returns a new [UserException], by merging the current one with the given [userException].
+  /// This simply means the given [userException] will be used as part of the [reason] of the
+  /// current one.
+  UserException mergedWith(UserException? userException) {
+    //
+    if (userException == null)
+      return this;
+    else {
+      var newReason = joinCauses(userException._msgOrCode(), userException.reason);
+      return addReason(newReason);
+    }
+  }
+
+  /// Based on the [message], [code] and [reason], returns the title and content to be
   /// used in some UI to show the exception the user. The UI is usually a dialog or toast.
   ///
-  /// If the exception has both a [message] an a [cause], the title will be
-  /// the [message], and its content will be the [cause]. Otherwise, the title
+  /// If the exception has both a [message] an a [reason], the title will be
+  /// the [message], and its content will be the [reason]. Otherwise, the title
   /// will be empty, and the content will be the [message].
   ///
   /// Alternatively, if you provide a numeric [code] instead of a [message], the
@@ -106,21 +107,21 @@ class UserException implements Exception {
   ///
   (String, String) titleAndContent() {
     if (_ifHasMsgOrCode()) {
-      if (cause == null || cause!.isEmpty)
+      if (reason == null || reason!.isEmpty)
         return ('', _msgOrCode());
       else
-        return (_msgOrCode(), cause ?? '');
+        return (_msgOrCode(), reason ?? '');
     }
     //
-    else if (cause != null && cause!.isNotEmpty)
-      return ('', cause ?? '');
+    else if (reason != null && reason!.isNotEmpty)
+      return ('', reason ?? '');
     //
     else
       return ('User Error', '');
   }
 
   /// Use this to set the locale used by method [titleAndContent] to translate the
-  /// text "Reason:" used to explain the chain of causes in the [UserException].
+  /// text "Reason:" used to explain the chain of reasons in the [UserException].
   ///
   /// If you remove the locale with `setDefaultLocale(null)`, the default will
   /// be English of the Unites States.
@@ -145,7 +146,7 @@ class UserException implements Exception {
     return "$first${defaultJoinString()}$second";
   };
 
-  /// The default text to join the causes in a string.
+  /// The default text to join the reasons in a string.
   /// You can change this variable to inject another way to join them.
   static var defaultJoinString = () => "\n\n${"Reason:".i18n} ";
 
@@ -199,7 +200,7 @@ class UserException implements Exception {
   bool _ifHasMsgOrCode() => (message != null && message!.isNotEmpty) || code != null;
 
   @override
-  String toString() => 'UserException{' + joinCauses(_msgOrCode(), cause) + '}';
+  String toString() => 'UserException{' + joinCauses(_msgOrCode(), reason) + '}';
 
   @override
   bool operator ==(Object other) =>
@@ -207,9 +208,9 @@ class UserException implements Exception {
       other is UserException &&
           runtimeType == other.runtimeType &&
           message == other.message &&
-          cause == other.cause &&
+          reason == other.reason &&
           code == other.code;
 
   @override
-  int get hashCode => message.hashCode ^ cause.hashCode ^ code.hashCode;
+  int get hashCode => message.hashCode ^ reason.hashCode ^ code.hashCode;
 }
