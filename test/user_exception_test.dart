@@ -3,6 +3,31 @@ import 'package:i18n_extension_core/i18n_extension_core.dart';
 import 'package:test/test.dart';
 
 void main() {
+  test('toString', () {
+    expect(const UserException('').toString(), 'UserException{}');
+
+    expect(const UserException('m').toString(), 'UserException{m}');
+
+    expect(const UserException('m', reason: 'r').toString(), 'UserException{m|Reason: r}');
+
+    expect(const UserException('', reason: 'r').toString(), 'UserException{r}');
+
+    expect(
+        const UserException('m', reason: 'r', code: 42).toString(), 'UserException{42|Reason: r}');
+
+    expect(
+        const UserException('', reason: 'r', code: 42).toString(), 'UserException{42|Reason: r}');
+
+    expect(const UserException('m', reason: 'r', ifOpenDialog: false).toString(),
+        'UserException{m|Reason: r, ifOpenDialog: false}');
+
+    expect(const UserException('m', reason: 'r', ifOpenDialog: false, errorText: 'et').toString(),
+        'UserException{m|Reason: r, ifOpenDialog: false, errorText: "et"}');
+
+    expect(const UserException('m', reason: 'r', errorText: 'et').toString(),
+        'UserException{m|Reason: r, errorText: "et"}');
+  });
+
   test('Creates UserException with correct properties', () {
     var exception = const UserException(
       'message',
@@ -98,7 +123,8 @@ void main() {
 
     // null + errorText
     exception = const UserException('');
-    exception = exception.mergedWith(const UserException('Extra', errorText: 'yet another error text'));
+    exception =
+        exception.mergedWith(const UserException('Extra', errorText: 'yet another error text'));
     expect(exception.errorText, 'yet another error text');
   });
 

@@ -342,9 +342,9 @@ class UserException implements Exception {
               .replaceAll('  ', ' ')
               .replaceAll('\n', '|')
               .replaceAll('||', '|'),
-          (ifOpenDialog ? '' : 'ifOpenDialog: false'),
-          ((errorText?.isNotEmpty ?? false) ? 'errorText: "$errorText"' : ''),
-        ].join(', ') +
+          (ifOpenDialog ? null : 'ifOpenDialog: false'),
+          ((errorText?.isNotEmpty ?? false) ? 'errorText: "$errorText"' : null),
+        ].where((x) => x?.isNotEmpty ?? false).join(', ') +
         '}';
   }
 
