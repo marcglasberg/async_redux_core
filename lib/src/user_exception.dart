@@ -186,7 +186,12 @@ class UserException implements Exception {
       return this;
     else {
       var newReason = joinCauses(userException._msgOrCode(), userException.reason);
-      return addReason(newReason);
+
+      // If any of the exceptions has ifOpenDialog `false`, the merged exception will have it too.
+      if (ifOpenDialog && !userException.ifOpenDialog)
+        return userException = noDialog.addReason(newReason);
+      else
+        return addReason(newReason);
     }
   }
 

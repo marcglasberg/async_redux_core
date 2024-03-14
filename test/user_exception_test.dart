@@ -62,6 +62,20 @@ void main() {
 
     expect(exception.toString(),
         'UserException{Extra|Reason: Extra, ifOpenDialog: false, errorText: "my error text"}');
+
+    // ---
+
+    exception = const UserException('');
+    expect(exception.ifOpenDialog, isTrue);
+    exception = exception.mergedWith(const UserException('Extra'));
+    expect(exception.ifOpenDialog, isTrue);
+    exception = exception.mergedWith(const UserException('Extra', ifOpenDialog: false));
+    expect(exception.ifOpenDialog, isFalse);
+
+    exception = const UserException('', ifOpenDialog: false);
+    expect(exception.ifOpenDialog, isFalse);
+    exception = exception.mergedWith(const UserException('Extra', ifOpenDialog: true));
+    expect(exception.ifOpenDialog, isFalse);
   });
 
   // Test all combinations:
