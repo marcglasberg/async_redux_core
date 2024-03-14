@@ -203,16 +203,20 @@ class UserException implements Exception {
   }
 
   @useResult
+  UserException get noDialog => withDialog(false);
+
+  /// Defines if this exception should open a dialog or not.
+  /// If not, it will be shown in a different way, usually showing [errorText]
+  /// somewhere in the UI.
+  @useResult
   @mustBeOverridden
-  UserException get noDialog {
-    return UserException(
-      message,
-      reason: reason,
-      code: code,
-      ifOpenDialog: false,
-      errorText: errorText,
-    );
-  }
+  UserException withDialog(bool ifOpenDialog) => UserException(
+        message,
+        reason: reason,
+        code: code,
+        ifOpenDialog: ifOpenDialog,
+        errorText: errorText,
+      );
 
   /// Adds (or replaces, if it already exists) the given [newErrorText].
   /// If the [newErrorText] is `null` or empty, it will remove the [errorText].
