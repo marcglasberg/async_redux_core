@@ -175,23 +175,30 @@ class UserException implements Exception {
     }
   }
 
-  /// Returns a new [UserException], by merging the current one with the given [userException].
-  /// This simply means the given [userException] will be used as part of the [reason] of the
+  /// Returns a new [UserException], by merging the current one with the given [anotherUserException].
+  /// This simply means the given [anotherUserException] will be used as part of the [reason] of the
   /// current one.
   @useResult
   @mustBeOverridden
-  UserException mergedWith(UserException? userException) {
+  UserException mergedWith(UserException? anotherUserException) {
     //
-    if (userException == null)
+    if (anotherUserException == null)
       return this;
     else {
-      var newReason = joinCauses(userException._msgOrCode(), userException.reason);
+      var newReason = joinCauses(anotherUserException._msgOrCode(), anotherUserException.reason);
+
+      var mergedException = addReason(newReason);
 
       // If any of the exceptions has ifOpenDialog `false`, the merged exception will have it too.
-      if (ifOpenDialog && !userException.ifOpenDialog)
-        return userException = noDialog.addReason(newReason);
-      else
-        return addReason(newReason);
+      if (ifOpenDialog && !anotherUserException.ifOpenDialog)
+        mergedException = mergedException.noDialog;
+
+      // If any of the exceptions has `errorText`, the merged exception will have it too.
+      // If both have it, keep the one from the [anotherUserException].
+      if (anotherUserException.errorText?.isNotEmpty ?? false)
+        mergedException = mergedException.withErrorText(anotherUserException.errorText);
+
+      return mergedException;
     }
   }
 
@@ -208,6 +215,7 @@ class UserException implements Exception {
   }
 
   /// Adds (or replaces, if it already exists) the given [newErrorText].
+  /// If the [newErrorText] is `null` or empty, it will remove the [errorText].
   @useResult
   @mustBeOverridden
   UserException withErrorText(String? newErrorText) {

@@ -1,4 +1,4 @@
-## 1.1.1
+## 1.1.2
 
 * Added `ifOpenDialog` and `errorText` to the `UserException`.
 

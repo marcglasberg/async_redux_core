@@ -76,6 +76,30 @@ void main() {
     expect(exception.ifOpenDialog, isFalse);
     exception = exception.mergedWith(const UserException('Extra', ifOpenDialog: true));
     expect(exception.ifOpenDialog, isFalse);
+
+    // ---
+
+    // null + null
+    exception = const UserException('');
+    exception = exception.mergedWith(const UserException('Extra'));
+    expect(exception.errorText, isNull);
+
+    // errorText
+    exception = const UserException('', errorText: 'my error text');
+    expect(exception.errorText, 'my error text');
+
+    // errorText + null
+    exception = exception.mergedWith(const UserException('Extra'));
+    expect(exception.errorText, 'my error text');
+
+    // errorText + errorText
+    exception = exception.mergedWith(const UserException('Extra', errorText: 'another error text'));
+    expect(exception.errorText, 'another error text');
+
+    // null + errorText
+    exception = const UserException('');
+    exception = exception.mergedWith(const UserException('Extra', errorText: 'yet another error text'));
+    expect(exception.errorText, 'yet another error text');
   });
 
   // Test all combinations:
