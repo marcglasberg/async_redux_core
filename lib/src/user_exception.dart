@@ -116,13 +116,30 @@ class UserException implements Exception {
   /// Another text which is the reason of the user-exception.
   final String? reason;
 
+  /// If `true`, the [UserExceptionDialog] will show in the dialog or similar UI.
+  /// If `false` you can still show the error in a different way, usually showing [errorText]
+  /// in the UI element that is responsible for the error.
+  final bool ifOpenDialog;
+
+  /// Some text to be displayed in the UI element that is responsible for the error.
+  /// For example, a text field could show this text in its `errorText` property.
+  /// When building your widgets, you can get the [errorText] from the failed action:
+  /// `String errorText = context.exceptionFor(MyAction)?.errorText`.
+  final String? errorText;
+
   /// Creates a [UserException], given a message [message] of type String,
   /// a [reason] of type String or [UserException], and an optional numeric [code].
   /// All fields are optional, but usually at least the [message] or [code] is provided.
+  ///
+  /// If [ifOpenDialog] is `false`, the [UserExceptionDialog] will not show the dialog.
+  /// The default is `true`, which usually means the error should be shown as state in the
+  /// screen.
   const UserException(
     this.message, {
     this.code,
     this.reason,
+    this.ifOpenDialog = true,
+    this.errorText,
   });
 
   /// Returns a new [UserException], copied from the current one, but adding the given [reason].
@@ -135,11 +152,26 @@ class UserException implements Exception {
       return this;
     else {
       if (_ifHasMsgOrCode()) {
-        return UserException(message, code: code, reason: joinCauses(this.reason, reason));
+        return UserException(
+          message,
+          code: code,
+          reason: joinCauses(this.reason, reason),
+          ifOpenDialog: ifOpenDialog,
+          errorText: errorText,
+        );
       } else if (this.reason != null && this.reason!.isNotEmpty)
-        return UserException(this.reason, reason: reason);
+        return UserException(
+          this.reason,
+          reason: reason,
+          ifOpenDialog: ifOpenDialog,
+          errorText: errorText,
+        );
       else
-        return UserException(reason);
+        return UserException(
+          reason,
+          ifOpenDialog: ifOpenDialog,
+          errorText: errorText,
+        );
     }
   }
 
@@ -156,6 +188,31 @@ class UserException implements Exception {
       var newReason = joinCauses(userException._msgOrCode(), userException.reason);
       return addReason(newReason);
     }
+  }
+
+  @useResult
+  @mustBeOverridden
+  UserException get noDialog {
+    return UserException(
+      message,
+      reason: reason,
+      code: code,
+      ifOpenDialog: false,
+      errorText: errorText,
+    );
+  }
+
+  /// Adds (or replaces, if it already exists) the given [newErrorText].
+  @useResult
+  @mustBeOverridden
+  UserException withErrorText(String? newErrorText) {
+    return UserException(
+      message,
+      reason: reason,
+      code: code,
+      ifOpenDialog: ifOpenDialog,
+      errorText: newErrorText,
+    );
   }
 
   /// Based on the [message], [code] and [reason], returns the title and content to be
@@ -265,7 +322,18 @@ class UserException implements Exception {
   bool _ifHasMsgOrCode() => (message != null && message!.isNotEmpty) || code != null;
 
   @override
-  String toString() => 'UserException{' + joinCauses(_msgOrCode(), reason) + '}';
+  String toString() {
+    return 'UserException{' +
+        [
+          joinCauses(_msgOrCode(), reason)
+              .replaceAll('  ', ' ')
+              .replaceAll('\n', '|')
+              .replaceAll('||', '|'),
+          (ifOpenDialog ? '' : 'ifOpenDialog: false'),
+          ((errorText?.isNotEmpty ?? false) ? 'errorText: "$errorText"' : ''),
+        ].join(', ') +
+        '}';
+  }
 
   @override
   bool operator ==(Object other) =>
@@ -273,9 +341,16 @@ class UserException implements Exception {
       other is UserException &&
           runtimeType == other.runtimeType &&
           message == other.message &&
+          code == other.code &&
           reason == other.reason &&
-          code == other.code;
+          ifOpenDialog == other.ifOpenDialog &&
+          errorText == other.errorText;
 
   @override
-  int get hashCode => message.hashCode ^ reason.hashCode ^ code.hashCode;
+  int get hashCode =>
+      message.hashCode ^
+      code.hashCode ^
+      reason.hashCode ^
+      ifOpenDialog.hashCode ^
+      errorText.hashCode;
 }

@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 void main() {
   test('Creates UserException with correct properties', () {
-    const exception = UserException(
+    var exception = const UserException(
       'message',
       reason: 'reason',
       code: 123,
@@ -13,6 +13,55 @@ void main() {
     expect(exception.message, 'message');
     expect(exception.reason, 'reason');
     expect(exception.code, 123);
+    expect(exception.ifOpenDialog, true);
+    expect(exception.errorText, isNull);
+
+    // ---
+
+    exception = const UserException(
+      '',
+      reason: 'reason',
+      code: 123,
+      errorText: 'my error text',
+      ifOpenDialog: false,
+    );
+
+    expect(exception.message, '');
+    expect(exception.reason, 'reason');
+    expect(exception.code, 123);
+    expect(exception.ifOpenDialog, false);
+    expect(exception.errorText, 'my error text');
+
+    exception = exception.withErrorText('my error text 2');
+    expect(exception.errorText, 'my error text 2');
+
+    exception = exception.withErrorText(null);
+    expect(exception.errorText, isNull);
+
+    // ---
+
+    exception = const UserException(
+      '',
+      reason: '',
+      errorText: 'my error text',
+    ).noDialog;
+
+    expect(exception.message, '');
+    expect(exception.reason, '');
+    expect(exception.code, isNull);
+    expect(exception.ifOpenDialog, false);
+    expect(exception.errorText, 'my error text');
+
+    exception = exception.mergedWith(const UserException('Extra'));
+    expect(exception.ifOpenDialog, false);
+    expect(exception.errorText, 'my error text');
+
+    exception = exception.addReason('Extra');
+    expect(exception.ifOpenDialog, false);
+    expect(exception.errorText, 'my error text');
+
+    expect(exception.toString(),
+        'UserException{Extra|Reason: Extra, ifOpenDialog: false, errorText: "my error text"}');
   });
 
   // Test all combinations:
@@ -171,8 +220,7 @@ void main() {
     //    - Dialog title: `msg`
     //    - Dialog content: `reason`
     //
-    exception =
-        const UserException('message', reason: 'reason').addReason('Extra');
+    exception = const UserException('message', reason: 'reason').addReason('Extra');
     expect(exception.titleAndContent(), ('message', 'reason${joinStr}Extra'));
 
     // 6) - `msg` is NOT provided
@@ -204,8 +252,7 @@ void main() {
     //    - Dialog content: `reason`
     //    - Ignored: `msg`
     //
-    exception =
-        const UserException(null, reason: 'reason', code: 123).addReason('Extra');
+    exception = const UserException(null, reason: 'reason', code: 123).addReason('Extra');
     expect(exception.titleAndContent(), ('123', 'reason${joinStr}Extra'));
   });
 
@@ -231,7 +278,8 @@ void main() {
     //    - Dialog title: NÃO TEM
     //    - Dialog content: `reason`
     //
-    exception = const UserException(null, reason: 'reason').mergedWith(const UserException('Extra'));
+    exception =
+        const UserException(null, reason: 'reason').mergedWith(const UserException('Extra'));
     expect(exception.titleAndContent(), ('reason', 'Extra'));
 
     // 3) - `msg` is NOT provided
@@ -299,8 +347,8 @@ void main() {
     //    - Dialog content: `reason`
     //    - Ignored: `msg`
     //
-    exception =
-        const UserException(null, reason: 'reason', code: 123).mergedWith(const UserException('Extra'));
+    exception = const UserException(null, reason: 'reason', code: 123)
+        .mergedWith(const UserException('Extra'));
     expect(exception.titleAndContent(), ('123', 'reason${joinStr}Extra'));
   });
 
