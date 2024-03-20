@@ -202,6 +202,10 @@ class UserException implements Exception {
     }
   }
 
+  /// This exception should NOT open a dialog.
+  /// Still, the error may be shown in a different way, usually showing [errorText]
+  /// somewhere in the UI.
+  /// This is the same as doing: `.withDialog(false)`.
   @useResult
   UserException get noDialog => withDialog(false);
 
