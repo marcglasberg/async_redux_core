@@ -1,3 +1,5 @@
+[![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
+
 [![pub package](https://img.shields.io/pub/v/async_redux_core.svg)](https://pub.dartlang.org/packages/async_redux_core  )
 
 # async_redux_core
@@ -87,4 +89,3 @@ _https://medium.com/@marcglasberg_<br>
 *My article in the official Flutter documentation*:
 
 * <a href="https://flutter.dev/docs/development/ui/layout/constraints">Understanding constraints</a>
-
