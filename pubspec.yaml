@@ -3,6 +3,10 @@ description: Dart-only core package for the Async Redux state management, the ea
 version: 1.2.1
 # author: Marcelo Glasberg <marcglasberg@gmail.com>
 homepage: https://github.com/marcglasberg/async_redux_core
+topics:
+  - redux
+  - state-management
+  - reactive-programming
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
