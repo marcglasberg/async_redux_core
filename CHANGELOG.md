@@ -1,10 +1,12 @@
-## 1.2.1
-
-* Sponsored by [MyText.ai](https://mytext.ai)
+Sponsored by [MyText.ai](https://mytext.ai)
 
 [![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
 
-## 1.2.0
+## 1.3.0
+
+* Dependency version bump.
+
+## 1.2.1
 
 * Added `ifOpenDialog`, `withDialog` and `errorText` to the `UserException`.
 
