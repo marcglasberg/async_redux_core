@@ -1,9 +1,9 @@
 import 'package:i18n_extension_core/i18n_extension_core.dart';
 
 extension Localization on String {
-  static final _t = Translations.byText('en_us') +
+  static final _t = Translations.byText('en-US') +
       {
-        "en_us": "Reason:", // English
+        "en-US": "Reason:", // English
         "es": "Razón:", // Spanish
         "fr": "Raison:", // French
         "de": "Grund:", // German

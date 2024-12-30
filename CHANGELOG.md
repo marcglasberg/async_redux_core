@@ -2,6 +2,10 @@ Sponsored by [MyText.ai](https://mytext.ai)
 
 [![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
 
+## 1.3.1
+
+* Fixed translation typo bug.
+
 ## 1.3.0
 
 * Dependency version bump.

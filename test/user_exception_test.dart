@@ -451,13 +451,13 @@ void main() {
 
   test('The code is translated to the current locale using `codeTranslations`.', () {
     //
-    UserException.codeTranslations = Translations.byId('en_us', {
+    UserException.codeTranslations = Translations.byId('en-US', {
       1: {
-        'en_us': 'Code One',
+        'en-US': 'Code One',
         'pt': 'Código Um',
       },
       2: {
-        'en_us': 'Code Two',
+        'en-US': 'Code Two',
         'pt': 'Código Dois',
       },
     });
@@ -502,11 +502,11 @@ void main() {
     exception = const UserException('message', code: 123);
     expect(exception.titleAndContent(), ('', '123'));
 
-    // Use the 'en_us' translation (specified here: `Translations.byId('en_us'`).
+    // Use the 'en-US' translation (specified here: `Translations.byId('en_us'`).
     exception = const UserException('message', code: 1);
     expect(exception.titleAndContent(), ('', 'Code One'));
 
-    // Use the 'en_us' translation (specified here: `Translations.byId('en_us'`).
+    // Use the 'en-US' translation (specified here: `Translations.byId('en_us'`).
     exception = const UserException('message', code: 2);
     expect(exception.titleAndContent(), ('', 'Code Two'));
 
