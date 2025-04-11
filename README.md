@@ -11,32 +11,55 @@ the [async_redux](https://pub.dev/packages/async_redux) package._
 
 * Do NOT include this core package directly.
 
-  Instead, go to the [async_redux](https://pub.dev/packages/async_redux) package which
-  already exports this core code, plus provides Flutter related code.
+  Instead, go to the [async_redux](https://pub.dev/packages/async_redux) package
+  which already exports this core code, plus provides Flutter related code.
 
 ## In your Dart server or Dart-only code:
 
-* For the moment, this Dart-only package simply contains the `UserException` class, and nothing
-  more.
+* For the moment, this Dart-only package simply contains the `UserException`
+  class, and nothing more.
 
-* If you are creating code for a Dart server (backend) like [Celest](https://celest.dev/), or
-  developing some Dart-only package that does not depend on Flutter, then you can use this package
-  directly:
+    * If you are creating code for a Dart server (backend)
+      like [Serverpod](https://serverpod.dev/),
+      or [Celest](https://celest.dev/),
+      or developing some other Dart-only package that does not depend on
+      Flutter,
+      then you can use this package directly:
 
-  ```
-  import 'package:async_redux_core/async_redux_core.dart';
-  ```                                                              
+      ```
+      import 'package:async_redux_core/async_redux_core.dart';
+      ```                                                              
 
-  > Note: When using [Celest](https://celest.dev/), this is especially useful for
-  throwing `UserException` in your backend code. Celest will make sure to throw that exception
-  in the frontend. As long as the Celest cloud function is called inside redux actions, Async Redux
-  will display the exception message to the user in a dialog (or other UI element that you can
-  customize). This can also be used
+  > Note: When using Serverpod or Celest, you can throw `UserException` in your
+  backend code, and that exception will automatically be thrown in the frontend.
+  As long as the Serverpod or Celest cloud function is called inside redux
+  actions, Async Redux will display the exception message to the user in a
+  dialog (or other UI element that you can customize). This can also be used
   with [package i18n_extension_core](https://pub.dartlang.org/packages/i18n_extension_core)
   to make sure the error message gets translated to the user's language.
-  For example: `UserException('The password you typed is invalid'.i18n);` in the backend, will
-  reach the frontend already translated
-  as `UserException('La contraseña que ingresaste no es válida')` if the user device is in Spanish.
+  For example: `UserException('The password you typed is invalid'.i18n);` in the
+  backend, will reach the frontend already translated as
+  `UserException('La contraseña que ingresaste no es válida')` if the user
+  device is in Spanish.
+
+  > Note: For this to work in Serverpod, after you import `async_redux_core`
+  in the `pubspec.yaml` file of the server project, you must add the
+  `UserException` class to your `generator.yaml` file, in its `extraClasses`
+  section:
+
+  ```
+  type: server
+
+  client_package_path: ../my_client
+  server_test_tools_path: test/integration/test_tools
+
+  modules:
+    serverpod_auth:
+      nickname: auth
+  
+  extraClasses:
+    - package:async_redux_core/async_redux_core.dart:UserException
+  ```
 
 ## Documentation
 
@@ -50,7 +73,8 @@ Go to [async_redux](https://pub.dev/packages/async_redux) to read the docs.
 <br>
 <a href="https://github.com/marcglasberg">_github.com/marcglasberg_</a>
 <br>
-<a href="https://www.linkedin.com/in/marcglasberg/">_linkedin.com/in/marcglasberg/_</a>
+<a href="https://www.linkedin.com/in/marcglasberg/">
+_linkedin.com/in/marcglasberg/_</a>
 <br>
 <a href="https://twitter.com/glasbergmarcelo">_twitter.com/glasbergmarcelo_</a>
 <br>
@@ -62,8 +86,8 @@ _stackoverflow.com/users/3411681/marcg_</a>
 
 *My article in the official Flutter documentation*:
 
-* <a href="https://flutter.dev/docs/development/ui/layout/constraints">Understanding
-  constraints</a>
+* <a href="https://flutter.dev/docs/development/ui/layout/constraints">
+  Understanding constraints</a>
 
 *The Flutter packages I've authored:*
 
@@ -71,13 +95,17 @@ _stackoverflow.com/users/3411681/marcg_</a>
 * <a href="https://pub.dev/packages/provider_for_redux">provider_for_redux</a>
 * <a href="https://pub.dev/packages/i18n_extension">i18n_extension</a>
 * <a href="https://pub.dev/packages/align_positioned">align_positioned</a>
-* <a href="https://pub.dev/packages/network_to_file_image">network_to_file_image</a>
+* <a href="https://pub.dev/packages/network_to_file_image">
+  network_to_file_image</a>
 * <a href="https://pub.dev/packages/image_pixels">image_pixels</a>
 * <a href="https://pub.dev/packages/matrix4_transform">matrix4_transform</a>
-* <a href="https://pub.dev/packages/back_button_interceptor">back_button_interceptor</a>
+* <a href="https://pub.dev/packages/back_button_interceptor">
+  back_button_interceptor</a>
 * <a href="https://pub.dev/packages/indexed_list_view">indexed_list_view</a>
-* <a href="https://pub.dev/packages/animated_size_and_fade">animated_size_and_fade</a>
-* <a href="https://pub.dev/packages/assorted_layout_widgets">assorted_layout_widgets</a>
+* <a href="https://pub.dev/packages/animated_size_and_fade">
+  animated_size_and_fade</a>
+* <a href="https://pub.dev/packages/assorted_layout_widgets">
+  assorted_layout_widgets</a>
 * <a href="https://pub.dev/packages/weak_map">weak_map</a>
 * <a href="https://pub.dev/packages/themed">themed</a>
 * <a href="https://pub.dev/packages/bdd_framework">bdd_framework</a>

@@ -185,7 +185,8 @@ class UserException implements Exception {
     if (anotherUserException == null)
       return this;
     else {
-      var newReason = joinCauses(anotherUserException._msgOrCode(), anotherUserException.reason);
+      var newReason = joinCauses(
+          anotherUserException._msgOrCode(), anotherUserException.reason);
 
       var mergedException = addReason(newReason);
 
@@ -196,7 +197,8 @@ class UserException implements Exception {
       // If any of the exceptions has `errorText`, the merged exception will have it too.
       // If both have it, keep the one from the [anotherUserException].
       if (anotherUserException.errorText?.isNotEmpty ?? false)
-        mergedException = mergedException.withErrorText(anotherUserException.errorText);
+        mergedException =
+            mergedException.withErrorText(anotherUserException.errorText);
 
       return mergedException;
     }
@@ -325,7 +327,9 @@ class UserException implements Exception {
   /// the [translateCode] method to return a string from the [code] in any way you want.
   ///
   static String Function(int?) translateCode = (int? code) =>
-      (codeTranslations == null) ? (code?.toString() ?? '') : localize(code, codeTranslations!);
+      (codeTranslations == null)
+          ? (code?.toString() ?? '')
+          : localize(code, codeTranslations!);
 
   /// If there is a [code], and this [code] has a translation, return the translation.
   /// If the translation is empty, return the [message].
@@ -340,7 +344,50 @@ class UserException implements Exception {
       return message ?? '';
   }
 
-  bool _ifHasMsgOrCode() => (message != null && message!.isNotEmpty) || code != null;
+  bool _ifHasMsgOrCode() =>
+      (message != null && message!.isNotEmpty) || code != null;
+
+  /// Converts the exception into a JSON map.
+  /// This is compatible with Serverpod.
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'code': code,
+      'reason': reason,
+      'ifOpenDialog': ifOpenDialog,
+      'errorText': errorText,
+    };
+  }
+
+  /// Creates a UserException instance from a JSON map.
+  /// This is compatible with Serverpod.
+  factory UserException.fromJson(Map<String, dynamic> json) {
+    return UserException(
+      json['message'] as String?,
+      code: json['code'] as int?,
+      reason: json['reason'] as String?,
+      ifOpenDialog: json['ifOpenDialog'] as bool? ?? true,
+      errorText: json['errorText'] as String?,
+    );
+  }
+
+  /// Returns a new instance with some fields replaced by new values.
+  /// This is compatible with Serverpod.
+  UserException copyWith({
+    String? message,
+    int? code,
+    String? reason,
+    bool? ifOpenDialog,
+    String? errorText,
+  }) {
+    return UserException(
+      message ?? this.message,
+      code: code ?? this.code,
+      reason: reason ?? this.reason,
+      ifOpenDialog: ifOpenDialog ?? this.ifOpenDialog,
+      errorText: errorText ?? this.errorText,
+    );
+  }
 
   @override
   String toString() {
