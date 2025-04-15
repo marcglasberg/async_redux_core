@@ -1,6 +1,6 @@
 name: async_redux_core
 description: Dart-only core package for the Async Redux state management, the easy and powerful version of Redux.
-version: 1.4.0
+version: 1.4.1
 # author: Marcelo Glasberg <marcglasberg@gmail.com>
 homepage: https://github.com/marcglasberg/async_redux_core
 topics:
@@ -13,6 +13,7 @@ environment:
 
 dependencies:
   i18n_extension_core: ^5.0.0
+  serverpod_serialization: ^2.5.1
   meta: ^1.11.0
 
 dev_dependencies:

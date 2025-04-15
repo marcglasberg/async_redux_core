@@ -4,6 +4,7 @@
 import 'package:async_redux_core/src/user_exception_i18n.dart';
 import 'package:i18n_extension_core/i18n_extension_core.dart';
 import "package:meta/meta.dart";
+import 'package:serverpod_serialization/serverpod_serialization.dart';
 
 /// The [UserException] is an immutable class representing an error the user
 /// could fix, like wrong typed text, or missing internet connection.
@@ -105,7 +106,7 @@ import "package:meta/meta.dart";
 /// expect(() => someFunction(), throwsUserException);
 /// ```
 ///
-class UserException implements Exception {
+class UserException implements Exception, SerializableException  {
   /// Some message shown to the user.
   final String? message;
 
@@ -349,6 +350,7 @@ class UserException implements Exception {
 
   /// Converts the exception into a JSON map.
   /// This is compatible with Serverpod.
+  @override
   Map<String, dynamic> toJson() {
     return {
       'message': message,
