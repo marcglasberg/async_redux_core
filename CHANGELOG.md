@@ -4,6 +4,10 @@ Sponsored by [MyText.ai](https://mytext.ai)
 
 ## 1.4.1
 
+* Bumped dependency versions.
+
+## 1.4.1
+
 * UserException now has `fromJson`, `toJson`, and `copyWith` methods.
   This makes it compatible with Serverpod.
 
