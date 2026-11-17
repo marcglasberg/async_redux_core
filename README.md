@@ -1,4 +1,4 @@
-[![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
+[![](./example/SponsoredByMyTextAi.jpg)](https://mytext.ai)
 
 [![pub package](https://img.shields.io/pub/v/async_redux_core.svg)](https://pub.dartlang.org/packages/async_redux_core  )
 
