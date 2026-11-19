@@ -2,6 +2,10 @@ Sponsored by [MyText.ai](https://mytext.ai)
 
 [![](./example/SponsoredByMyTextAi.jpg)](https://mytext.ai)
 
+## 1.5.2
+
+* Support i18n_extension_core 5.x and 6.x, allowing AsyncRedux and i18n_extension 16 to share locale and translation types.
+
 ## 1.5.1
 
 * Bumped dependency versions.
